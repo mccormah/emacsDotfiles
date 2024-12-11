@@ -1,0 +1,9 @@
+# Backup files
+*~
+# Other Folders and Files
+auto-save-list/
+eln-cache/
+elpa/
+elpaca/
+recentf
+transient/
