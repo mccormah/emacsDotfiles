@@ -552,10 +552,10 @@ The modeline is the bottom status bar that appears in Emacs windows. While you c
 * NEOTREE
 Neotree is a file tree viewer.  When you open neotree, it jumps to the current file thanks to neo-smart-open.  The neo-window-fixed-size setting makes the neotree width be adjustable.  NeoTree provides following themes: classic, ascii, arrow, icons, and nerd.  Theme can be config’d by setting “two” themes for neo-theme: one for the GUI and one for the terminal.  I like to use ‘SPC t’ for ‘toggle’ keybindings, so I have used ‘SPC t n’ for toggle-neotree.
 
-| COMMAND        | DESCRIPTION              | KEYBINDING |
-|----------------+--------------------------+----------- |
-| neotree-toggle | Toggle neotree           | SPC t n    |
-| neotree-dir    | Open diretory in neotree | SPC d n    | 
+| COMMAND        | DESCRIPTION               | KEYBINDING |
+|----------------+---------------------------+------------|
+| neotree-toggle | Toggle neotree            | SPC t n    |
+| neotree-dir    | Open directory in neotree | SPC d n    |
 
 #+begin_src emacs-lisp
   (use-package neotree
@@ -600,8 +600,8 @@ Removes "Ind" from showing in the modeline.
 ** Org-Tempo
 Org-tempo is not a separate package but a module within org that can be enabled.  Org-tempo allows for ‘<s’ followed by TAB to expand to a begin_src tag.  Other expansions available include:
 
-| Typing the below + TAB | Expands to...                           |
-|------------------------+---------------------------------------- |
+| Typing the below + TAB | Expands to ...                          |
+|------------------------+-----------------------------------------|
 | <a                     | ’#+BEGIN_EXPORT ascii’ … ‘#+END_EXPORT' |
 | <c                     | ’#+BEGIN_CENTER’ … ‘#+END_CENTER’       |
 | <C                     | ’#+BEGIN_COMMENT’ … ‘#+END_COMMENT’     |
