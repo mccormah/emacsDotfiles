@@ -210,11 +210,11 @@
 
   ;; set up 'SPC' as the global leader key
   (general-create-definer
-   leader-keys
-   :states '(normal insert visual emacs)
-   :keymaps 'override
-   :prefix "SPC" ;; set leader
-   :global-prefix "M-SPC") ;; access leader in insert mode
+    leader-keys
+    :states '(normal insert visual emacs) 
+    :keymaps 'override 
+    :prefix "SPC" ;; set leader 
+    :global-prefix "M-SPC") ;; access leader in insert mode
 
   (leader-keys
    "SPC" '(counsel-M-x :wk "Counsel M-x")
@@ -236,11 +236,7 @@
    "b m" '(bookmark-set :wk "Set bookmark")
    "b n" '(next-buffer :wk "Next buffer")
    "b p" '(previous-buffer :wk "Previous buffer")
-   "b r" '(revert-buffer :wk "Reload buffer")
-   "b R" '(rename-buffer :wk "Rename buffer")
-   "b s" '(basic-save-buffer :wk "Save buffer")
-   "b S" '(save-some-buffers :wk "Save multiple buffers")
-   "b w" '(bookmark-save :wk "Save current bookmarks to bookmark file"))
+   "b r" '(revert-buffer :wk "Reload buffer") "b R" '(rename-buffer :wk "Rename buffer") "b s" '(basic-save-buffer :wk "Save buffer") "b S" '(save-some-buffers :wk "Save multiple buffers") "b w" '(bookmark-save :wk "Save current bookmarks to bookmark file"))
 
   (leader-keys
    "d" '(:ignore t :wk "Dired")
@@ -263,22 +259,15 @@
    "e n" '(eshell-new :wk "Create new eshell buffer")
    "e r" '(eval-region :wk "Evaluate elisp in region")
    "e R" '(eww-reload :which-key "Reload current page in EWW")
-   "e s" '(eshell :which-key "Eshell")
-   "e w" '(eww :which-key "EWW emacs web wowser"))
-
-  (leader-keys
-   "f" '(:ignore t :wk "Files")    
-   "f c" '((lambda () (interactive)
-             (find-file "~/.config/emacs/config.org")) 
-           :wk "Open emacs config.org")
+   "e s" '(eshell :which-key "Eshell") "e w" '(eww :which-key "EWW emacs web wowser")) (leader-keys "f" '(:ignore t :wk "Files") "f c" '((lambda () (interactive) (find-file "~/.config/emacs/config.org")) :wk "Open emacs config.org")
    "f e" '((lambda () (interactive)
-             (dired "~/.config/emacs/")) 
-           :wk "Open user-emacs-directory in dired")
+	     (dired "~/.config/emacs/")) 
+	   :wk "Open user-emacs-directory in dired")
    "f d" '(find-grep-dired :wk "Search for string in files in DIR")
    "f g" '(counsel-grep-or-swiper :wk "Search for string current file")
    "f i" '((lambda () (interactive)
-             (find-file "~/.config/emacs/init.el")) 
-           :wk "Open emacs init.el")
+	     (find-file "~/.config/emacs/init.el")) 
+	   :wk "Open emacs init.el")
    "f j" '(counsel-file-jump :wk "Jump to a file below current directory")
    "f l" '(counsel-locate :wk "Locate a file")
    "f r" '(counsel-recentf :wk "Find recent files")
@@ -334,9 +323,9 @@
    "h m" '(describe-mode :wk "Describe mode")
    "h r" '(:ignore t :wk "Reload")
    "h r r" '((lambda () (interactive)
-               (load-file "~/.config/emacs/init.el")
-                (ignore (elpaca-process-queues)))
-              :wk "Reload emacs config")
+	       (load-file "~/.config/emacs/init.el")
+		(ignore (elpaca-process-queues)))
+	      :wk "Reload emacs config")
    "h t" '(load-theme :wk "Load theme")
    "h v" '(describe-variable :wk "Describe variable")
    "h w" '(where-is :wk "Prints keybinding for command if set")
@@ -405,6 +394,20 @@
    "w u" '(upcase-word :wk "Upcase word")
    "w =" '(count-words :wk "Count words/lines for buffer"))
   )
+
+(use-package hl-todo
+  :ensure t
+  :hook ((org-mode . hl-todo-mode)
+         (prog-mode . hl-todo-mode))
+  :config
+  (setq hl-todo-highlight-punctuation ":"
+        hl-todo-keyword-faces
+        `(("TODO"       warning bold)
+          ("FIXME"      error bold)
+          ("HACK"       font-lock-constant-face bold)
+          ("REVIEW"     font-lock-keyword-face bold)
+          ("NOTE"       success bold)
+          ("DEPRECATED" font-lock-doc-face bold))))
 
 (use-package counsel
   :ensure t
