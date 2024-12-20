@@ -680,3 +680,28 @@ Transient is the library used to implement the keyboard-driven “menus” in Ma
     :ensure t)
 #+end_src
 
+* WHICH-KEY
+Which-Key is a plugin for Neovim and Emacs that helps you remember your keybindings by displaying available keybindings in a popup as you type. It’s designed to be highly customizable and flexible.
+
+#+begin_src emacs-lisp
+  (use-package which-key
+    :ensure t
+    :init
+    (which-key-mode 1)
+    :diminish
+    :config
+    (setq which-key-side-window-location 'bottom
+          which-key-sort-order #'which-key-key-order-alpha
+          which-key-allow-imprecise-window-fit nil
+          which-key-sort-uppercase-first nil
+          which-key-add-column-padding 1
+          which-key-max-display-columns nil
+          which-key-min-display-lines 6
+          which-key-side-window-slot -10
+          which-key-side-window-max-height 0.25
+          which-key-idle-delay 0.8
+          which-key-max-description-length 25
+          which-key-allow-imprecise-window-fit nil
+          which-key-separator " → " ))
+#+end_src
+
