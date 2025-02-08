@@ -1,9 +1,13 @@
 # Backup files
 *~
 # Other Folders and Files
+.org-id-locations
 auto-save-list/
+bookmarks
 eln-cache/
 elpa/
 elpaca/
+eshell/
+org-roam.db
 recentf
 transient/

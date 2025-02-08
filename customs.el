@@ -2,6 +2,7 @@
 (delete-selection-mode 1) ;; You can select text and delete it by typing.
 (electric-indent-mode -1) ;; Turn off the weird indenting that Emacs does by default.
 (scroll-bar-mode -1) ;; Disable the scroll bar
+(global-visual-line-mode t)  ;; Enable truncated lines
 
 (provide 'customs)
 
@@ -10,6 +11,7 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(org-agenda-files '("/home/franklin/Dropbox/orgzly/nodes"))
  '(package-selected-packages '(magit toc-org flycheck evil diminish counsel company)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.

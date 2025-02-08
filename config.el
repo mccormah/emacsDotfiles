@@ -130,6 +130,48 @@
   (evil-define-key 'normal peep-dired-mode-map (kbd "j") 'peep-dired-next-file)
   (evil-define-key 'normal peep-dired-mode-map (kbd "k") 'peep-dired-prev-file))
 
+;(setopt eshell-prompt-function 'fancy-shell)
+;(setopt eshell-prompt-regexp "^[^#$\n]* [$#] ")
+;(setopt eshell-highlight-prompt nil)
+
+;; Disabling company mode in eshell, because it's annoying.
+(setq company-global-modes '(not eshell-mode))
+
+;; A function for easily creating multiple buffers of 'eshell'.
+;; NOTE: `C-u M-x eshell` would also create new 'eshell' buffers.
+(defun eshell-new (name)
+  "Create new eshell buffer named NAME."
+  (interactive "sName: ")
+  (setq name (concat "$" name))
+  (eshell)
+  (rename-buffer name))
+
+(use-package eshell-toggle
+  :ensure t
+  :custom
+  (eshell-toggle-size-fraction 3)
+  (eshell-toggle-use-projectile-root t)
+  (eshell-toggle-run-command nil)
+  (eshell-toggle-init-function #'eshell-toggle-init-ansi-term))
+
+(use-package eshell-syntax-highlighting
+  :after esh-mode
+  :ensure t 
+  :config
+  (eshell-syntax-highlighting-global-mode +1))
+
+;; eshell-syntax-highlighting -- adds fish/zsh-like syntax highlighting.
+;; eshell-rc-script -- your profile for eshell; like a bashrc for eshell.
+;; eshell-aliases-file -- sets an aliases file for the eshell.
+(setq eshell-rc-script (concat user-emacs-directory "eshell/profile")
+      eshell-aliases-file (concat user-emacs-directory "eshell/aliases")
+      eshell-history-size 5000
+      eshell-buffer-maximum-lines 5000
+      eshell-hist-ignoredups t
+      eshell-scroll-to-bottom-on-input t
+      eshell-destroy-buffer-when-process-dies t
+      eshell-visual-commands'("bash" "fish" "htop" "ssh" "top" "zsh"))
+
 (use-package evil
   :init
   (setq evil-want-integration t
@@ -259,15 +301,18 @@
    "e n" '(eshell-new :wk "Create new eshell buffer")
    "e r" '(eval-region :wk "Evaluate elisp in region")
    "e R" '(eww-reload :which-key "Reload current page in EWW")
-   "e s" '(eshell :which-key "Eshell") "e w" '(eww :which-key "EWW emacs web wowser")) (leader-keys "f" '(:ignore t :wk "Files") "f c" '((lambda () (interactive) (find-file "~/.config/emacs/config.org")) :wk "Open emacs config.org")
+   "e s" '(eshell :which-key "Eshell") "e w" '(eww :which-key "EWW emacs web wowser")) 
+
+  (leader-keys
+   "f" '(:ignore t :wk "Files") "f c" '((lambda () (interactive) (find-file "~/.config/emacs/config.org")) :wk "Open emacs config.org")
    "f e" '((lambda () (interactive)
-	     (dired "~/.config/emacs/")) 
-	   :wk "Open user-emacs-directory in dired")
+             (dired "~/.config/emacs/")) 
+           :wk "Open user-emacs-directory in dired")
    "f d" '(find-grep-dired :wk "Search for string in files in DIR")
    "f g" '(counsel-grep-or-swiper :wk "Search for string current file")
    "f i" '((lambda () (interactive)
-	     (find-file "~/.config/emacs/init.el")) 
-	   :wk "Open emacs init.el")
+             (find-file "~/.config/emacs/init.el")) 
+            :wk "Open emacs init.el")
    "f j" '(counsel-file-jump :wk "Jump to a file below current directory")
    "f l" '(counsel-locate :wk "Locate a file")
    "f r" '(counsel-recentf :wk "Find recent files")
@@ -323,9 +368,9 @@
    "h m" '(describe-mode :wk "Describe mode")
    "h r" '(:ignore t :wk "Reload")
    "h r r" '((lambda () (interactive)
-	       (load-file "~/.config/emacs/init.el")
-		(ignore (elpaca-process-queues)))
-	      :wk "Reload emacs config")
+               (load-file "~/.config/emacs/init.el")
+                (ignore (elpaca-process-queues)))
+              :wk "Reload emacs config")
    "h t" '(load-theme :wk "Load theme")
    "h v" '(describe-variable :wk "Describe variable")
    "h w" '(where-is :wk "Prints keybinding for command if set")
@@ -347,6 +392,13 @@
   (leader-keys
    "m d" '(:ignore t :wk "Date/deadline")
    "m d t" '(org-time-stamp :wk "Org time stamp"))
+
+  (leader-keys
+    "n" '(:ignore t :wk "Org-Roam")
+    "n l" '(org-roam-buffer-toggle :wk "Open org-roam buffer")
+    "n f" '(org-roam-node-find :wk "Find the node or create it")
+    "n i" '(org-roam-node-insert :wk "Insert a link to the node or create it")
+    "n c" '(org-roam-capture :wk "Captures the node"))
 
   (leader-keys
    "o" '(:ignore t :wk "Open")
@@ -394,20 +446,6 @@
    "w u" '(upcase-word :wk "Upcase word")
    "w =" '(count-words :wk "Count words/lines for buffer"))
   )
-
-(use-package hl-todo
-  :ensure t
-  :hook ((org-mode . hl-todo-mode)
-         (prog-mode . hl-todo-mode))
-  :config
-  (setq hl-todo-highlight-punctuation ":"
-        hl-todo-keyword-faces
-        `(("TODO"       warning bold)
-          ("FIXME"      error bold)
-          ("HACK"       font-lock-constant-face bold)
-          ("REVIEW"     font-lock-keyword-face bold)
-          ("NOTE"       success bold)
-          ("DEPRECATED" font-lock-doc-face bold))))
 
 (use-package counsel
   :ensure t
@@ -474,6 +512,8 @@
                   (make-local-variable 'auto-hscroll-mode)
                   (setq auto-hscroll-mode nil)))))
 
+(setq org-agenda-files '("~/Dropbox/orgzly/nodes")) ;; Set the Org Agenda Directory
+
 (add-hook 'org-mode-hook 'org-indent-mode)
 (use-package org-bullets
   :ensure t)
@@ -487,6 +527,42 @@
   :commands toc-org-enable
   :init (add-hook 'org-mode-hook 'toc-org-enable)
   :ensure t)
+
+(setq org-todo-keywords
+      '((sequence "TODO" "NEXT" "|" "DONE")))
+
+(setq org-tag-alist '((:startgroup)
+                      ("project")
+                      ("area")
+                      ("resource")
+                      ("archive")
+                      (:endgroup)))
+
+(use-package org-roam
+  :ensure t
+  :init 
+  (setq org-roam-v2-ack t)
+  :custom
+  (org-roam-directory "~/Dropbox/orgzly/nodes")
+  (org-roam-completion-everywhere t)
+  (org-roam-capture-templates
+   '(("d" "default" plain 
+      "%?"
+      :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org"
+                         "#+TITLE: ${TITLE}\n#+CATEGORY: ${TITLE}\n")
+      :unnarrowed t)
+     ("n" "note" plain 
+      "%?"
+      :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org"
+                         "#+TITLE: ${TITLE}\n#+CATEGORY: ${TITLE}\n#+FILETAGS: note\n")
+      :unnarrowed t)
+     ("p" "project" plain
+      "\n\n* GOALS\n%?\n\n* TASKS\n* NOTES\n\n"
+      :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org"
+                         "#+TITLE: ${TITLE}\n#+CATEGORY: ${TITLE}\n#+FILETAGS: project\n")
+      :unnarrowed t))) 
+  :config
+  (org-roam-setup))
 
 (use-package rainbow-delimiters
   :ensure t
