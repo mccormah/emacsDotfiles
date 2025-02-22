@@ -523,13 +523,12 @@
 
 (require 'org-tempo)
 
-(use-package toc-org
-  :commands toc-org-enable
-  :init (add-hook 'org-mode-hook 'toc-org-enable)
-  :ensure t)
+(setq org-refile-targets
+      '(("20250216192355-archive.org" :maxlevel . 1)
+        ("20250107175232-tasks.org" :maxlevel . 1)))
 
-(setq org-todo-keywords
-      '((sequence "TODO" "NEXT" "|" "DONE")))
+;; Save Org buffers after refiling
+(advice-add 'org-refile :after 'org-save-all-org-buffers)
 
 (setq org-tag-alist '((:startgroup)
                       ("project")
@@ -537,6 +536,14 @@
                       ("resource")
                       ("archive")
                       (:endgroup)))
+
+(use-package toc-org
+  :commands toc-org-enable
+  :init (add-hook 'org-mode-hook 'toc-org-enable)
+  :ensure t)
+
+(setq org-todo-keywords
+      '((sequence "TODO" "NEXT" "|" "DONE")))
 
 (use-package org-roam
   :ensure t

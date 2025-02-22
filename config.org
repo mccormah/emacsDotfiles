@@ -658,6 +658,30 @@ Org-tempo is not a separate package but a module within org that can be enabled.
   (require 'org-tempo)
 #+end_src
 
+** Refile
+Sets org-refile-targets list so that tasks can be archived.
+
+#+begin_src emacs-lisp
+  (setq org-refile-targets
+        '(("20250216192355-archive.org" :maxlevel . 1)
+          ("20250107175232-tasks.org" :maxlevel . 1)))
+
+  ;; Save Org buffers after refiling
+  (advice-add 'org-refile :after 'org-save-all-org-buffers)
+#+end_src
+
+** Tag Lists
+Sets a list of tags needed for the PARA method. Defining multiple group tags and nesting them creates a tag hierarchy. Additionally, some group tags are mutually exclusive.
+
+#+begin_src emacs-lisp
+  (setq org-tag-alist '((:startgroup)
+                        ("project")
+                        ("area")
+                        ("resource")
+                        ("archive")
+                        (:endgroup)))
+#+end_src
+
 ** Toc-Org
 Allows us to create a Table of Contents in our Org docs.
 
@@ -674,18 +698,6 @@ Sets the todo states available in Org Mode.
 #+begin_src emacs-lisp
   (setq org-todo-keywords
         '((sequence "TODO" "NEXT" "|" "DONE")))
-#+end_src
-
-** Tag Lists
-Sets a list of tags needed for the PARA method. Defining multiple group tags and nesting them creates a tag hierarchy. Additionally, some group tags are mutually exclusive.
-
-#+begin_src emacs-lisp
-  (setq org-tag-alist '((:startgroup)
-                        ("project")
-                        ("area")
-                        ("resource")
-                        ("archive")
-                        (:endgroup)))
 #+end_src
 
 * ORG ROAM
