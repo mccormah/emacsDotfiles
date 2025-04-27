@@ -447,6 +447,61 @@
    "w =" '(count-words :wk "Count words/lines for buffer"))
   )
 
+;; The path to lsp-mode needs to be added to load-path as well as the
+;; path to the `clients' subdirectory.
+(add-to-list 'load-path (expand-file-name "lsp-mode" user-emacs-directory))
+(add-to-list 'load-path (expand-file-name "lsp-mode/clients" user-emacs-directory))
+
+(use-package lsp-mode
+  :ensure t
+  ;; set prefix for lsp-command-keymap (few alternatives - "C-l", "C-c l")
+  :init (setq lsp-keymap-prefix "C-c l"
+	      lsp-enable-on-type-formatting nil)
+  ;; if you want which-key integration
+  :hook (((css-mode
+           css-ts-mode
+           typescript-ts-mode
+           tsx-ts-mode
+	       yaml-mode
+           yaml-ts-mode
+           html-mode
+           html-ts-mode
+           js-mode
+           js-ts-mode
+           json-mode
+           json-ts-mode
+           bash-mode
+           bash-ts-mode
+           python-mode
+           python-ts-mode) . lsp)
+	   (lsp-mode . lsp-enable-which-key-integration))
+  :commands lsp
+  :config (add-hook 'java-mode-hook #'(lambda () (when (eq major-mode 'java-mode) (lsp-deferred)))))
+
+;; optionally
+(use-package lsp-ui 
+  :ensure t
+  :commands lsp-ui-mode)
+(use-package lsp-ivy 
+  :ensure t
+  :commands lsp-ivy-workspace-symbol)
+(use-package lsp-treemacs 
+  :ensure t
+  :commands lsp-treemacs-errors-list)
+
+;; The path to lsp-mode needs to be added to load-path
+(add-to-list 'load-path (expand-file-name "lsp-java" user-emacs-directory))
+
+(use-package lsp-java 
+  :ensure t
+  :after lsp
+  :config
+  (setq 
+   ;; Don't format my source code
+   lsp-java-format-enabled nil
+   ;; Don't organize imports on save
+   lsp-java-save-action-organize-imports nil))
+
 (use-package counsel
   :ensure t
   :hook ivy-mode
@@ -570,6 +625,12 @@
       :unnarrowed t))) 
   :config
   (org-roam-setup))
+
+(use-package projectile
+  :ensure t
+  :diminish
+  :config
+  (projectile-mode +1))
 
 (use-package rainbow-delimiters
   :ensure t
