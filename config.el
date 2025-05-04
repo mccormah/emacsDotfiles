@@ -447,6 +447,15 @@
    "w =" '(count-words :wk "Count words/lines for buffer"))
   )
 
+(use-package gptel
+  :ensure t
+  :config
+  (setq
+   gptel-backend (gptel-make-ollama "Ollama"
+				    :host "localhost:11434"
+				    :stream t
+				    :models '(llama3.2:latest))))
+
 ;; The path to lsp-mode needs to be added to load-path as well as the
 ;; path to the `clients' subdirectory.
 (add-to-list 'load-path (expand-file-name "lsp-mode" user-emacs-directory))
