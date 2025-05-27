@@ -493,7 +493,7 @@ and much more.
      "t n" '(neotree-toggle :wk "Toggle neotree file viewer")
      "t o" '(org-mode :wk "Toggle org mode")
      "t r" '(rainbow-mode :wk "Toggle rainbow mode")
-     "t t" '(visual-line-mode :wk "Toggle truncated lines")
+     "t t" '(treemacs :wk "Toggle treemacs file viewer")
      "t v" '(vterm-toggle :wk "Toggle vterm"))
 
     (leader-keys
@@ -546,42 +546,44 @@ Client for Language Server Protocol (v3.14). lsp-mode aims to provide IDE-like e
 #+end_src
 
 #+begin_src emacs-lisp
-(use-package lsp-mode
-  :ensure t
-  ;; set prefix for lsp-command-keymap (few alternatives - "C-l", "C-c l")
-  :init (setq lsp-keymap-prefix "C-c l"
-	      lsp-enable-on-type-formatting nil)
-  ;; if you want which-key integration
-  :hook (((css-mode
-           css-ts-mode
-           typescript-ts-mode
-           tsx-ts-mode
-	       yaml-mode
-           yaml-ts-mode
-           html-mode
-           html-ts-mode
-           js-mode
-           js-ts-mode
-           json-mode
-           json-ts-mode
-           bash-mode
-           bash-ts-mode
-           python-mode
-           python-ts-mode) . lsp)
-	   (lsp-mode . lsp-enable-which-key-integration))
-  :commands lsp
-  :config (add-hook 'java-mode-hook #'(lambda () (when (eq major-mode 'java-mode) (lsp-deferred)))))
+  (use-package lsp-mode
+    :ensure t
+    ;; set prefix for lsp-command-keymap (few alternatives - "C-l", "C-c l")
+    :init (setq lsp-keymap-prefix "C-c l"
+   	      lsp-enable-on-type-formatting nil)
+    ;; if you want which-key integration
+    :hook (((css-mode
+             css-ts-mode
+             typescript-ts-mode
+             tsx-ts-mode
+   	   yaml-mode
+             yaml-ts-mode
+             html-mode
+             html-ts-mode
+             js-mode
+             js-ts-mode
+             json-mode
+             json-ts-mode
+             bash-mode
+             bash-ts-mode
+             python-mode
+             python-ts-mode) . lsp)
+   	 (lsp-mode . lsp-enable-which-key-integration))
+    :commands lsp
+    :config (add-hook 'java-mode-hook #'(lambda () (when (eq major-mode 'java-mode) (lsp-deferred)))))
 
-;; optionally
-(use-package lsp-ui 
-  :ensure t
-  :commands lsp-ui-mode)
-(use-package lsp-ivy 
-  :ensure t
-  :commands lsp-ivy-workspace-symbol)
-(use-package lsp-treemacs 
-  :ensure t
-  :commands lsp-treemacs-errors-list)
+  ;; optionally
+  (use-package lsp-ui 
+    :ensure t
+    :commands lsp-ui-mode)
+
+  (use-package lsp-ivy 
+    :ensure t
+    :commands lsp-ivy-workspace-symbol)
+
+  (use-package lsp-treemacs 
+    :ensure t
+    :commands lsp-treemacs-errors-list)
 #+end_src
 
 ** Lsp Java
@@ -603,15 +605,23 @@ Emacs Java IDE using Eclipse JDT Language Server.
      ;; Don't organize imports on save
      lsp-java-save-action-organize-imports nil))
 #+end_src
+
 ** Dap Mode
 Emacs client/library for Debug Adapter Protocol (dap) is a wire protocol for communication between client and Debug Server. It’s similar to the LSP but provides integration with debug server.
-// Cannot get dap-java to function properly
+
+#+begin_src emacs-lisp
   (use-package dap-mode 
+    :ensure t
     :after lsp
     :config (dap-auto-configure-mode))
+#+end_src
 
+** Dap Java
+#+begin_src emacs-lisp
   (use-package dap-java 
-    :ensure nil)
+    :ensure t
+    :after lsp-java)
+#+end_src
 
 * IVY (COUNSEL)
 + Ivy, a generic completion mechanism for Emacs.
@@ -694,7 +704,8 @@ Neotree is a file tree viewer.  When you open neotree, it jumps to the current f
           neo-window-width 55
           neo-window-fixed-size nil
           inhibit-compacting-font-caches t
-          projectile-switch-project-action 'neotree-projectile-action) 
+          projectile-switch-project-action 'neotree-projectile-action
+  	neo-theme (if (display-graphic-p) 'icons 'arrow)) 
     ;; truncate long file names in neotree
     (add-hook 'neo-after-create-hook
               #'(lambda (_)
@@ -834,6 +845,13 @@ Org-roam is a tool for networked thought allowing for effortless non-hierarchica
     (projectile-mode +1))
 #+end_src
 
+To fix compile-time escape codes when building a maven project add the following hook:
+
+#+begin_src emacs-lisp
+  (add-hook 'compilation-filter-hook
+  	  (lambda () (ansi-color-apply-on-region (point-min) (point-max))))
+#+end_src
+
 * RAINBOW DELIMITERS
 Adding rainbow coloring to parentheses.
 
@@ -867,6 +885,9 @@ The doom-themes are being installed because it contains a huge ocllection of the
     (load-theme 'doom-palenight t)
     ;; Enable custom neotree theme (all-the-icons must be installed!)
     (doom-themes-neotree-config)
+    ;; or for treemacs users
+    (setq doom-themes-treemacs-theme "doom-colors") ; use "doom-colors" for less minimal icon theme
+    (doom-themes-treemacs-config)
     ;; Corrects (and improves) org-mode's native fontification.
     (doom-themes-org-config))
 #+end_src
@@ -876,6 +897,12 @@ Transient is the library used to implement the keyboard-driven “menus” in Ma
 
 #+begin_src emacs-lisp
   (use-package transient
+    :ensure t)
+#+end_src
+
+* TREEMACS
+#+begin_src emacs-lisp
+  (use-package treemacs-all-the-icons
     :ensure t)
 #+end_src
 

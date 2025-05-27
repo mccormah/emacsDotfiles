@@ -465,13 +465,13 @@
   :ensure t
   ;; set prefix for lsp-command-keymap (few alternatives - "C-l", "C-c l")
   :init (setq lsp-keymap-prefix "C-c l"
-	      lsp-enable-on-type-formatting nil)
+ 	      lsp-enable-on-type-formatting nil)
   ;; if you want which-key integration
   :hook (((css-mode
            css-ts-mode
            typescript-ts-mode
            tsx-ts-mode
-	       yaml-mode
+ 	   yaml-mode
            yaml-ts-mode
            html-mode
            html-ts-mode
@@ -483,7 +483,7 @@
            bash-ts-mode
            python-mode
            python-ts-mode) . lsp)
-	   (lsp-mode . lsp-enable-which-key-integration))
+ 	 (lsp-mode . lsp-enable-which-key-integration))
   :commands lsp
   :config (add-hook 'java-mode-hook #'(lambda () (when (eq major-mode 'java-mode) (lsp-deferred)))))
 
@@ -491,9 +491,11 @@
 (use-package lsp-ui 
   :ensure t
   :commands lsp-ui-mode)
+
 (use-package lsp-ivy 
   :ensure t
   :commands lsp-ivy-workspace-symbol)
+
 (use-package lsp-treemacs 
   :ensure t
   :commands lsp-treemacs-errors-list)
@@ -510,6 +512,15 @@
    lsp-java-format-enabled nil
    ;; Don't organize imports on save
    lsp-java-save-action-organize-imports nil))
+
+(use-package dap-mode 
+  :ensure t
+  :after lsp
+  :config (dap-auto-configure-mode))
+
+(use-package dap-java 
+  :ensure t
+  :after lsp-java)
 
 (use-package counsel
   :ensure t
@@ -566,7 +577,8 @@
         neo-window-width 55
         neo-window-fixed-size nil
         inhibit-compacting-font-caches t
-        projectile-switch-project-action 'neotree-projectile-action) 
+        projectile-switch-project-action 'neotree-projectile-action
+	neo-theme (if (display-graphic-p) 'icons 'arrow)) 
   ;; truncate long file names in neotree
   (add-hook 'neo-after-create-hook
             #'(lambda (_)
@@ -641,6 +653,9 @@
   :config
   (projectile-mode +1))
 
+(add-hook 'compilation-filter-hook
+	  (lambda () (ansi-color-apply-on-region (point-min) (point-max))))
+
 (use-package rainbow-delimiters
   :ensure t
   :hook ((emacs-lisp-mode . rainbow-delimiters-mode)
@@ -660,10 +675,16 @@
   (load-theme 'doom-palenight t)
   ;; Enable custom neotree theme (all-the-icons must be installed!)
   (doom-themes-neotree-config)
+  ;; or for treemacs users
+  (setq doom-themes-treemacs-theme "doom-colors") ; use "doom-colors" for less minimal icon theme
+  (doom-themes-treemacs-config)
   ;; Corrects (and improves) org-mode's native fontification.
   (doom-themes-org-config))
 
 (use-package transient
+  :ensure t)
+
+(use-package treemacs-all-the-icons
   :ensure t)
 
 (use-package which-key
