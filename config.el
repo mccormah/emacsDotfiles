@@ -1,19 +1,25 @@
-(defvar elpaca-installer-version 0.8)
+;; To deny JIT compilation for the library org-element and
+;; fix the org-roam issue when creating a new node
+;; (i.e., report it as a byte-code-function rather than a 
+;; native-comp-function)
+(setq native-comp-jit-compilation-deny-list '(".*org-element.*"))
+
+(defvar elpaca-installer-version 0.12)
 (defvar elpaca-directory (expand-file-name "elpaca/" user-emacs-directory))
 (defvar elpaca-builds-directory (expand-file-name "builds/" elpaca-directory))
-(defvar elpaca-repos-directory (expand-file-name "repos/" elpaca-directory))
+(defvar elpaca-sources-directory (expand-file-name "sources/" elpaca-directory))
 (defvar elpaca-order '(elpaca :repo "https://github.com/progfolio/elpaca.git"
-                              :ref nil :depth 1
+                              :ref nil :depth 1 :inherit ignore
                               :files (:defaults "elpaca-test.el" (:exclude "extensions"))
-                              :build (:not elpaca--activate-package)))
-(let* ((repo  (expand-file-name "elpaca/" elpaca-repos-directory))
+                              :build (:not elpaca-activate)))
+(let* ((repo  (expand-file-name "elpaca/" elpaca-sources-directory))
        (build (expand-file-name "elpaca/" elpaca-builds-directory))
        (order (cdr elpaca-order))
        (default-directory repo))
   (add-to-list 'load-path (if (file-exists-p build) build repo))
   (unless (file-exists-p repo)
     (make-directory repo t)
-    (when (< emacs-major-version 28) (require 'subr-x))
+    (when (<= emacs-major-version 28) (require 'subr-x))
     (condition-case-unless-debug err
         (if-let* ((buffer (pop-to-buffer-same-window "*elpaca-bootstrap*"))
                   ((zerop (apply #'call-process `("git" nil ,buffer t "clone"
@@ -33,42 +39,28 @@
   (unless (require 'elpaca-autoloads nil t)
     (require 'elpaca)
     (elpaca-generate-autoloads "elpaca" repo)
-    (load "./elpaca-autoloads")))
+    (let ((load-source-file-function nil)) (load "./elpaca-autoloads"))))
 (add-hook 'after-init-hook #'elpaca-process-queues)
 (elpaca `(,@elpaca-order))
-
-;; Install a package via the elpaca macro
-;; See the "recipes" section of the manual for more details.
-
-;; (elpaca example-package)
 
 ;; Install use-package support
 (elpaca elpaca-use-package
   ;; Enable use-package :ensure support for Elpaca.
   (elpaca-use-package-mode))
 
-;;When installing a package used in the init file itself,
-;;e.g. a package which adds a use-package key word,
-;;use the :wait recipe keyword to block until that package is installed/configured.
-;;For example:
-;;(use-package general :ensure (:wait t) :demand t)
-
-;;Turns off elpaca-use-package-mode current declaration
-;;Note this will cause evaluate the declaration immediately. It is not deferred.
-;;Useful for configuring built-in emacs features.
-(use-package emacs :ensure nil :config (setq ring-bell-function #'ignore))
+;; :ensure packages by default
+(setq use-package-always-ensure t)
 
 (use-package all-the-icons
-  :ensure t
+  :demand t
   :if (display-graphic-p))
 
 (use-package all-the-icons-dired
-  :ensure t
+  :demand t
   :hook (dired-mode . (lambda () (all-the-icons-dired-mode t))))
 
 (use-package company
   :defer 2
-  :ensure t 
   :diminish
   :custom
   (company-begin-commands '(self-insert-command))
@@ -80,7 +72,6 @@
 
 (use-package company-box
   :after company
-  :ensure t
   :diminish
   :hook (company-mode . company-box-mode))
 
@@ -91,7 +82,7 @@
 (add-hook 'elpaca-after-init-hook (lambda () (load custom-file 'noerror)))
 
 (use-package dashboard
-  :ensure t 
+  :demand t 
   :init
   (setq initial-buffer-choice 'dashboard-open)
   (setq dashboard-set-heading-icons t)
@@ -99,27 +90,25 @@
   (setq dashboard-banner-logo-title "Emacs Is More Than A Text Editor!")
   (setq dashboard-startup-banner 'logo) ;; use standard emacs logo as banner
   (setq dashboard-center-content nil) ;; set to 't' for centered content
+  (setq dashboard-projects-backend 'projectile) ;; sets the projects backend to projectile to ensure projects are displayed in the dashboard 
   (setq dashboard-items '((recents . 5)
                           (agenda . 5 )
-                          (bookmarks . 3)
-                          (projects . 3)))
+                          (projects . 5)))
   :custom 
   (dashboard-modify-heading-icons '((recents . "file-text")
                                     (bookmarks . "book")))
   :config
   (dashboard-setup-startup-hook))
 
-(use-package diminish
-  :ensure t)
+(use-package diminish)
 
 (use-package dired-open
-  :ensure t
   :config
   (setq dired-open-extensions '(("gif" . "sxiv")
-                                ("jpg" . "sxiv")
-                                ("png" . "sxiv")
-                                ("mkv" . "mpv")
-                                ("mp4" . "mpv"))))
+				("jpg" . "sxiv")
+				("png" . "sxiv")
+				("mkv" . "mpv")
+				("mp4" . "mpv"))))
 
 (use-package peep-dired
   :after dired
@@ -147,7 +136,6 @@
   (rename-buffer name))
 
 (use-package eshell-toggle
-  :ensure t
   :custom
   (eshell-toggle-size-fraction 3)
   (eshell-toggle-use-projectile-root t)
@@ -156,7 +144,6 @@
 
 (use-package eshell-syntax-highlighting
   :after esh-mode
-  :ensure t 
   :config
   (eshell-syntax-highlighting-global-mode +1))
 
@@ -201,7 +188,6 @@
 (setq org-return-follows-link t)
 
 (use-package flycheck
-  :ensure t
   :defer t
   :diminish
   :init (global-flycheck-mode))
@@ -246,7 +232,7 @@
 (global-set-key (kbd "<C-wheel-down>") 'text-scale-decrease)
 
 (use-package general
-  :ensure t
+  :demand t
   :config
   (general-evil-setup)
 
@@ -420,7 +406,7 @@
    "t n" '(neotree-toggle :wk "Toggle neotree file viewer")
    "t o" '(org-mode :wk "Toggle org mode")
    "t r" '(rainbow-mode :wk "Toggle rainbow mode")
-   "t t" '(visual-line-mode :wk "Toggle truncated lines")
+   "t t" '(treemacs :wk "Toggle treemacs file viewer")
    "t v" '(vterm-toggle :wk "Toggle vterm"))
 
   (leader-keys
@@ -448,7 +434,6 @@
   )
 
 (use-package gptel
-  :ensure t
   :config
   (setq
    gptel-backend (gptel-make-ollama "Ollama"
@@ -462,19 +447,17 @@
 (add-to-list 'load-path (expand-file-name "lsp-mode/clients" user-emacs-directory))
 
 (use-package lsp-mode
-  :ensure t
   ;; set prefix for lsp-command-keymap (few alternatives - "C-l", "C-c l")
   :init (setq lsp-keymap-prefix "C-c l"
  	      lsp-enable-on-type-formatting nil)
   ;; if you want which-key integration
   :hook (((css-mode
            css-ts-mode
-           typescript-ts-mode
-           tsx-ts-mode
- 	   yaml-mode
-           yaml-ts-mode
-           html-mode
+	   yaml-ts-mode
+	   html-mode
            html-ts-mode
+	   tsx-ts-mode
+	   typescript-ts-mode
            js-mode
            js-ts-mode
            json-mode
@@ -483,28 +466,24 @@
            bash-ts-mode
            python-mode
            python-ts-mode) . lsp)
- 	 (lsp-mode . lsp-enable-which-key-integration))
+	 (lsp-mode . lsp-enable-which-key-integration))
   :commands lsp
   :config (add-hook 'java-mode-hook #'(lambda () (when (eq major-mode 'java-mode) (lsp-deferred)))))
 
 ;; optionally
 (use-package lsp-ui 
-  :ensure t
   :commands lsp-ui-mode)
 
 (use-package lsp-ivy 
-  :ensure t
   :commands lsp-ivy-workspace-symbol)
 
 (use-package lsp-treemacs 
-  :ensure t
   :commands lsp-treemacs-errors-list)
 
 ;; The path to lsp-mode needs to be added to load-path
 (add-to-list 'load-path (expand-file-name "lsp-java" user-emacs-directory))
 
-(use-package lsp-java 
-  :ensure t
+(use-package lsp-java
   :after lsp
   :config
   (setq 
@@ -513,24 +492,24 @@
    ;; Don't organize imports on save
    lsp-java-save-action-organize-imports nil))
 
+;;  (setq major-mode-remap-alist
+;;        '((typescript-mode . typescript-ts-mode)))
+
 (use-package dap-mode 
-  :ensure t
   :after lsp
   :config (dap-auto-configure-mode))
 
-(use-package dap-java 
-  :ensure t
-  :after lsp-java)
+;;  (use-package dap-java 
+;;    :ensure t
+;;    :after lsp-java)
 
 (use-package counsel
-  :ensure t
   :hook ivy-mode
   :diminish
   :config (counsel-mode)
   (setq ivy-initial-inputs-alist nil)) ;; removes starting ^ regex in M-x
 
 (use-package ivy
-  :ensure t
   :bind
   ;; ivy-resume resumes the last Ivy-based completion.
   (("C-c C-r" . ivy-resume)
@@ -544,23 +523,18 @@
   (ivy-mode))
 
 (use-package all-the-icons-ivy-rich
-  :ensure t
   :init (all-the-icons-ivy-rich-mode 1))
 
 (use-package ivy-rich
-  :ensure t
   :init (ivy-rich-mode 1) ;; this gets us descriptions in M-x.
   :hook ivy-mode
   :custom
   (setq ivy-rich-path-style 'abbrev))
 
 (use-package magit
-  :after transient
-  :ensure t
-  )
+  :after transient)
 
 (use-package doom-modeline
-  :ensure t
   :init
   (doom-modeline-mode 1)
   :config
@@ -570,7 +544,6 @@
         doom-modeline-persp-icon t)) ;; adds folder icon next to persp name
 
 (use-package neotree
-  :ensure t
   :config
   (setq neo-smart-open t
         neo-show-hidden-files t
@@ -591,8 +564,7 @@
 (setq org-agenda-files '("~/Dropbox/orgzly/nodes")) ;; Set the Org Agenda Directory
 
 (add-hook 'org-mode-hook 'org-indent-mode)
-(use-package org-bullets
-  :ensure t)
+(use-package org-bullets)
 (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
 
 (eval-after-load 'org-indent '(diminish 'org-indent-mode))
@@ -615,16 +587,12 @@
 
 (use-package toc-org
   :commands toc-org-enable
-  :init (add-hook 'org-mode-hook 'toc-org-enable)
-  :ensure t)
+  :init (add-hook 'org-mode-hook 'toc-org-enable))
 
 (setq org-todo-keywords
       '((sequence "TODO" "NEXT" "|" "DONE")))
 
 (use-package org-roam
-  :ensure t
-  :init 
-  (setq org-roam-v2-ack t)
   :custom
   (org-roam-directory "~/Dropbox/orgzly/nodes")
   (org-roam-completion-everywhere t)
@@ -645,10 +613,10 @@
                          "#+TITLE: ${TITLE}\n#+CATEGORY: ${TITLE}\n#+FILETAGS: project\n")
       :unnarrowed t))) 
   :config
-  (org-roam-setup))
+  (org-roam-setup)
+  (org-roam-db-autosync-mode))
 
 (use-package projectile
-  :ensure t
   :diminish
   :config
   (projectile-mode +1))
@@ -657,17 +625,15 @@
 	  (lambda () (ansi-color-apply-on-region (point-min) (point-max))))
 
 (use-package rainbow-delimiters
-  :ensure t
   :hook ((emacs-lisp-mode . rainbow-delimiters-mode)
          (clojure-mode . rainbow-delimiters-mode)))
 
 (use-package rainbow-mode
-  :ensure t
+  :demand t
   :diminish
   :hook org-mode prog-mode)
 
 (use-package doom-themes
-  :ensure t
   :config
   (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
         doom-themes-enable-italic t) ; if nil, italics is universally disabled
@@ -681,14 +647,11 @@
   ;; Corrects (and improves) org-mode's native fontification.
   (doom-themes-org-config))
 
-(use-package transient
-  :ensure t)
+(use-package transient)
 
-(use-package treemacs-all-the-icons
-  :ensure t)
+(use-package treemacs-all-the-icons)
 
 (use-package which-key
-  :ensure t
   :init
   (which-key-mode 1)
   :diminish
