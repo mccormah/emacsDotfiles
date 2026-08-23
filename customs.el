@@ -1,4 +1,10 @@
-(set-cursor-color "#CB0005") ;; Sets teh cursor color to Warhorse Red.
+;;; init.el --- Elpaca Init File -*- lexical-binding: t; -*-
+
+;;; Commentary:
+
+;;; Code:
+(set-cursor-color "#CB0005") ;; Sets the cursor color to Warhorse Red.
+
 (delete-selection-mode 1) ;; You can select text and delete it by typing.
 (electric-indent-mode -1) ;; Turn off the weird indenting that Emacs does by default.
 (scroll-bar-mode -1) ;; Disable the scroll bar
@@ -11,6 +17,7 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(major-mode-remap-alist '((typescript-mode . typescript-ts-mode)))
  '(org-agenda-files '("/home/franklin/Dropbox/orgzly/nodes"))
  '(package-selected-packages '(magit toc-org flycheck evil diminish counsel company)))
 (custom-set-faces
@@ -18,4 +25,6 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- )
+)
+
+;;; customs.el ends here
