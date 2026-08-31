@@ -1,4 +1,4 @@
-;; To deny JIT compilation for the library org-element and
+;; To deny JIT compilation for the library org-element and  -*- lexical-binding: t; -*
 ;; fix the org-roam issue when creating a new node
 ;; (i.e., report it as a byte-code-function rather than a 
 ;; native-comp-function)

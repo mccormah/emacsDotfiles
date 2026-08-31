@@ -7,7 +7,7 @@ My emacsDotfiles repository contains the .config files necessary to get Emacs up
 * LSP, LSP-JAVA
 * EVIL
 * ELPACA Package Manager for Emacs
-* MAGIT
+* MAGIT - Emacs GIT version control
 * PROJECTILE
 
 The config.org file is the documentation version of config.el. The config.el file consists of the Emacs Lisp used to run Emacs. I hope this helps you get Emacs customized and ready to tackle the projects that matter most to you.
